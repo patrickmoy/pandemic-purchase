@@ -59,7 +59,7 @@ function checkStockMultipleItems(html, type) {
                 name: $(this).find('.grouped-item-row .item-name').text(),
                 stock: $(this).find('.bin-stock-availability').text().trim() || "Available",
                 price: $(this).find('.grouped-item-row .item-price').text().trim()
-            };
+            };ddd
         });
     } else if (type === 'Titan') {
         $('.product-detail.set-item').each(function(i, element) {
