@@ -18,8 +18,8 @@ async function searchPage(url, vendor, pageType) {
                 itemData = checkStockSingle(html, vendor);
             } else if (pageType === 'multiple') {
                 itemData = checkStockMultiple(html, vendor);
-                console.log("DATA:" + itemData);
             }
+            console.log(itemData);
             return itemData;
         })
         .catch(err => {
@@ -55,7 +55,7 @@ function checkStockSingle(html, type) {
     return itemData;
 }
 
-async function checkStockMultiple(html, type) {
+function checkStockMultiple(html, type) {
     let itemData = [];
     let $ = cheerio.load(html);
     if (type === 'Rogue') {

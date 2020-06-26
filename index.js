@@ -25,7 +25,7 @@ app.listen(process.env.PORT || 5000, () => {
 async function testHandler() {
     try {
         const testUrl = "https://www.titan.fitness/strength/dumbbells/urethane/urethane-dumbbells-%7C-5---120-lb-%7C-pair/URDMBL_GROUP.html";
-        let testData = await searchFunction(testUrl, "Titan", "multiple");
+        searchFunction(testUrl, "Titan", "multiple").then(items => console.log(items));
     } catch (err) {
         console.log("Error: " + err);
     }
