@@ -1,6 +1,5 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
 
 const testUrl = 'https://www.roguefitness.com/rogue-45lb-ohio-powerlift-bar-cerakote';
 const testUrl2 = "https://www.roguefitness.com/rogue-vertical-plate-tree-2-0";
@@ -11,17 +10,24 @@ const testUrl6 = "https://www.roguefitness.com/rogue-calibrated-kg-steel-plates"
 const testUrl7 = "https://www.roguefitness.com/rogue-vertical-plate-tree-2-0";
 const testUrl8 = "https://www.titan.fitness/strength/dumbbells/urethane/urethane-dumbbells-%7C-5---120-lb-%7C-pair/URDMBL_GROUP.html";
 
-rp(testUrl8)
-    .then(html => {
-        let itemData = checkStockMultipleItems(html, 'Titan');
-        // let itemData = checkStockSingleItem(html, "Rogue");
-        console.log(itemData);
-    })
-    .catch(err => {
-        console.log(err);
-    });
+async function searchPage(url, vendor, pageType) {
+    await rp(url)
+        .then(html => {
+            let itemData;
+            if (pageType === 'single') {
+                itemData = checkStockSingle(html, vendor);
+            } else if (pageType === 'multiple') {
+                itemData = checkStockMultiple(html, vendor);
+                console.log("DATA:" + itemData);
+            }
+            return itemData;
+        })
+        .catch(err => {
+            console.log("Error: " + err);
+        });
+}
 
-function checkStockSingleItem(html, type) {
+function checkStockSingle(html, type) {
     let itemData = [];
     let $ = cheerio.load(html);
     if (type === 'Rogue') {
@@ -49,7 +55,7 @@ function checkStockSingleItem(html, type) {
     return itemData;
 }
 
-function checkStockMultipleItems(html, type) {
+async function checkStockMultiple(html, type) {
     let itemData = [];
     let $ = cheerio.load(html);
     if (type === 'Rogue') {
@@ -59,7 +65,7 @@ function checkStockMultipleItems(html, type) {
                 name: $(this).find('.grouped-item-row .item-name').text(),
                 stock: $(this).find('.bin-stock-availability').text().trim() || "Available",
                 price: $(this).find('.grouped-item-row .item-price').text().trim()
-            };ddd
+            };
         });
     } else if (type === 'Titan') {
         $('.product-detail.set-item').each(function(i, element) {
@@ -71,10 +77,11 @@ function checkStockMultipleItems(html, type) {
             };
         });
     } else if (type === 'Rep') {
-        $()
     }
     return itemData;
 }
 
-
+module.exports = {
+    searchPage
+};
 
