@@ -8,7 +8,7 @@ const app = express();
 const bodyParser = require("body-parser");
 
 // Scrape function from utilities
-const scraper = require("./utilities/utils.js").scrapeHandler;
+const scraper = require('./utilities/utils.js').scrapeHandler;
 
 // "/search" endpoint uses inventory.js
 app.use('/data', require('./routes/inventory.js'));
