@@ -1,16 +1,32 @@
+
 const rp = require('request-promise');
+
 const cheerio = require('cheerio');
 
-const testUrl = 'https://www.roguefitness.com/rogue-45lb-ohio-powerlift-bar-cerakote';
-const testUrl2 = "https://www.roguefitness.com/rogue-vertical-plate-tree-2-0";
-const testUrl3 =  "https://www.roguefitness.com/the-volcano";
-const testUrl4 = "https://www.repfitness.com/in-stock-items/rep-sled-harness";
-const testUrl5 = "https://www.titan.fitness/racks/squat-stands/x-3-series/x-3-short-squat-stand/400423.html";
-const testUrl6 = "https://www.roguefitness.com/rogue-calibrated-kg-steel-plates";
-const testUrl7 = "https://www.roguefitness.com/rogue-vertical-plate-tree-2-0";
-const testUrl8 = "https://www.titan.fitness/strength/dumbbells/urethane/urethane-dumbbells-%7C-5---120-lb-%7C-pair/URDMBL_GROUP.html";
+const pool = require('./sql.js');
 
-async function searchPage(url, vendor, pageType) {
+async function topLevelHandler() {
+    try {
+        let theQuery = "SELECT LookupID, Link, Vendor, Type FROM LOOKUPS";
+        pool.query(theQuery)
+            .then(result => {
+                for (let i = 0; i < result.rows.length; i++) {
+                    let source = result.rows[i];
+                    searchPage(source.link, source.vendor, source.type, source.lookupid)
+                        .then(result => console.log("Updated!"))
+                        .catch(err => console.log(err));
+                }
+            })
+            .catch(err => {
+                console.log("Link retrieval failed - " + err.detail);
+            });
+
+    } catch (err) {
+        console.log("Error: " + err);
+    }
+}
+
+async function searchPage(url, vendor, pageType, lookupid) {
     await rp(url)
         .then(html => {
             let itemData;
@@ -19,12 +35,26 @@ async function searchPage(url, vendor, pageType) {
             } else if (pageType === 'multiple') {
                 itemData = checkStockMultiple(html, vendor);
             }
-            console.log(itemData);
-            return itemData;
+            updateLookup(itemData, lookupid);
+            return false;
         })
         .catch(err => {
             console.log("Error: " + err);
         });
+}
+
+function updateLookup(itemArray, lookupid) {
+    for (let j = 0; j < itemArray.length; j++) {
+        let newQuery = `INSERT INTO Items (Name, Price, InStock, LookupID) VALUES ($1, $2, $3, $4) ON CONFLICT (Name) DO UPDATE SET Price = $2, InStock = $3`;
+        let newValues = [itemArray[j].name, reformatPrice(itemArray[j].price), reformatStock(itemArray[j].stock), lookupid];
+        pool.query(newQuery, newValues)
+            .then(result => {
+                // console.log("Updated: " + itemArray[j].name);
+            })
+            .catch(err => {
+                console.log("Error: " + err.detail);
+            });
+    }
 }
 
 function checkStockSingle(html, type) {
@@ -41,7 +71,7 @@ function checkStockSingle(html, type) {
         itemData[0] = {
             vendor: type,
             name: $(".product-name > h1[itemprop='name']").text(),
-            stock: $(".availability.in-stock").text(),
+            stock: $(".product-info .availability > span").text(),
             price: $('[itemprop="price"]').attr('content')
         }
     } else if (type === 'Titan') {
@@ -81,7 +111,29 @@ function checkStockMultiple(html, type) {
     return itemData;
 }
 
+function reformatPrice (oldPrice) {
+    if (oldPrice.indexOf('$') === -1) {
+        return '$' + oldPrice;
+    } else {
+        return oldPrice;
+    }
+}
+
+function reformatStock (oldStock) {
+    let oldStockUpper = oldStock.toUpperCase();
+    if (oldStockUpper.includes('NOTIFY ME') || oldStockUpper.includes('OUT OF STOCK')) {
+        return 0;
+    } else if (oldStockUpper.includes('BACKORDER')) {
+        return 2;
+    } else if (oldStockUpper.includes('IN STOCK') || oldStockUpper.includes('AVAILABLE')) {
+        return 1;
+    } else {
+        console.log("Error with unrecognized stock string: " + oldStockUpper);
+        return -1;
+    }
+}
+
 module.exports = {
-    searchPage
+    handler: topLevelHandler
 };
 
