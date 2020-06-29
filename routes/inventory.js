@@ -36,9 +36,7 @@ router.get('/', (req, res) => {
     let theQuery = "SELECT * FROM Items";
     pool.query(theQuery)
         .then(result => {
-            res.status(200).send({
-                data: result.rows,
-            });
+            res.status(200).send(result);
         })
         .catch(err => {
             res.status(400).send({
