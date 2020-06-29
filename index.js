@@ -7,19 +7,20 @@ const app = express();
 // Bodyparser npm module
 const bodyParser = require("body-parser");
 
+// Path module for managing directory access
+const path = require('path');
+
 // Scrape function from utilities
 const scraper = require('./utilities/utils.js').scrapeHandler;
+
+app.use(express.static(path.join(__dirname, '/public')));
 
 // "/search" endpoint uses inventory.js
 app.use('/data', require('./routes/inventory.js'));
 
-app.get("/", (request, response) => {
-    //this is a Web page so set the content-type to HTML
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<h' + 3 + ' style="color:black">TEST</h' + 3 + '>');
-    response.write('<h' + 6 + ' style="color:blue">Patrick Moy</h' + 6 + '>');
-    response.end(); //end the response
-});
+// Base endpoint uses view.js
+app.use("/", require('./routes/view.js'));
+
 
 // Listens for server running.
 app.listen(process.env.PORT || 5000, () => {

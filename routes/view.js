@@ -30,7 +30,7 @@ router.use(bodyParser.json());
  * @apiUse JSONError
  */
 router.get('/', (req, res) => {
-    res.status(200).sendFile(path.join(__dirname + '/view.html'));
+    res.status(200).sendFile(path.join(__dirname, '../views/view.html'));
 });
 
 module.exports = router;
