@@ -18,6 +18,5 @@
     "body-parser": "latest",
     "pg": "latest"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

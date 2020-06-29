@@ -22,9 +22,10 @@ CREATE TABLE Items (ItemID SERIAL PRIMARY KEY,
                     FOREIGN KEY(LookupID) REFERENCES Lookups(LookupID)
 );
 
-DROP TABLE IF EXISTS Notifications
+DROP TABLE IF EXISTS Notifications;
 CREATE TABLE Notifications (NotificationID SERIAL PRIMARY KEY,
                             ItemID INT NOT NULL,
+                            Email VARCHAR(255) NOT NULL,
                             FOREIGN KEY (ItemID) REFERENCES Items(ItemID)
 );
 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : TwoColours
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20130811
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+    <link href="default.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
+
+    <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+<body>
+
+
+<div id="header">
+    <div id="menu" class="container">
+        <ul>
+            <li class="current_page_item"><a href="#" class="tab-link" onclick="openPage('home-tab', this);return false;" accesskey="1" title="">Home</a></li>
+            <li><a href="#" class="tab-link" onclick="openPage('stock-tab', this);return false;" accesskey="2" title="">What's In Stock</a></li>
+            <li><a href="#" class="tab-link" onclick="openPage('notify-tab', this);return false;" accesskey="3" title="">Get Notified</a></li>
+            <li><a href="#" class="tab-link" onclick="openPage('about-tab', this);return false;" accesskey="4" title="">About</a></li>
+        </ul>
+    </div>
+</div>
+<div id="logo" class="container">
+    <h1><a href="#" class="icon icon-tasks"><span>Pandemic Purchase</span></a></h1>
+</div>
+
+<div id="home-tab" class="tab-content">
+    <div id="page" class="container">
+        <div id="content">
+            <div class="title">
+                <h2>Welcome to Pandemic Purchase!</h2>
+                <span class="byline">Find out what's in stock for gym equipment today</span>
+            </div>
+            <p>This is <strong>Pandemic Purchase</strong>, a free, basic stock-checking bot designed by Patrick Moy, an
+                aspiring software developer based in Seattle, WA. It automatically checks Rogue Fitness, Titan Fitness,
+                and
+                Rep Fitness, 3 of the biggest online gym equipment vendors, for several popular items to see if they're
+                in
+                stock. Users can sign up to be notified once an item becomes available. </p>
+        </div>
+    </div>
+    <div id="contact" class="container">
+        <div class="title">
+            <h2>Get in touch</h2>
+            <span class="byline">Reach out if you'd like to chat!</span>
+        </div>
+        <ul class="contact">
+            <li><a href="#" class="icon icon-github"><span>GitHub</span></a></li>
+            <li><a href="#" class="icon icon-envelope"><span>Email</span></a></li>
+            <li><a href="#" class="icon icon-linkedin"><span>LinkedIn</span></a></li>
+            <li><a href="#" class="icon icon-home"><span>Portfolio</span></a></li>
+        </ul>
+    </div>
+</div>
+
+<div id="stock-tab" style="display:none;" class="tab-content">
+    <div class="container">
+        <div>
+            <div class="title">
+                <h2>Check stock</h2>
+                <span class="byline">View the full inventory list here</span>
+                <br>
+                <input type="button" onclick="getStockData()" value="View/Refresh"/>
+            </div>
+
+
+            <p id="stock-data"></p>
+        </div>
+
+    </div>
+</div>
+
+<div id="notify-tab" style="display:none;" class="tab-content">
+    <div class="container">
+        <div>
+            <div class="title">
+                <h2>Check stock</h2>
+                <span class="byline">View the full inventory list here</span>
+            </div>
+
+            <p></p>
+        </div>
+    </div>
+</div>
+
+<div id="about-tab" style="display:none;" class="tab-content">
+    <div id="page2" class="container">
+        <div id="content2">
+            <div class="title">
+                <h2>About the App</h2>
+                <span class="byline">Maintaining fitness during quarantine</span>
+            </div>
+            <p>During the onset of the <strong>COVID-19</strong> pandemic, I decided to start building a home gym since
+                all public gyms were required to close. Many other people had the same idea, and as a result, the price
+                of second-hand gym equipment skyrocketed. At the same time, virtually all online retailers sold out of
+                their new stock. I decided to create this basic bot to save the average user the hassle of having to
+                obsessively refresh vendor pages to check for the items they want. </p>
+        </div>
+    </div>
+</div>
+
+<div id="copyright" class="container">
+    <p>&copy; Untitled. All rights reserved. | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
+</div>
+</body>
+<script>
+    function openPage(pageName, element) {
+        let i, tabContent, tabLinks;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+
+        tabLinks = document.getElementsByClassName("tab-link");
+        for (i = 0; i < tabLinks.length; i++) {
+        //    tabLinks[i].style.backgroundColor = "";
+        }
+
+        // Show the specific tab content
+        document.getElementById(pageName).style.display = "block";
+
+        // Add the specific color to the button used to open the tab content
+    }
+
+    function getStockData(parameter = "") {
+        connectGet("http://localhost:5000/data", "stock-data");
+    }
+
+    function connectGet(url, elementID) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let col = [];
+                for (let i = 0; i < data.length; i++) {
+                    for (let key in data[i]) {
+                        if (col.indexOf(key) === -1) {
+                            col.push(key);
+                        }
+                    }
+                }
+
+                // CREATE DYNAMIC TABLE.
+                let table = document.createElement("table");
+
+                // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+
+                let tr = table.insertRow(-1);                   // TABLE ROW.
+
+                for (let i = 0; i < col.length; i++) {
+                    let th = document.createElement("th");      // TABLE HEADER.
+                    th.innerHTML = col[i];
+                    tr.appendChild(th);
+                }
+
+                // ADD JSON DATA TO THE TABLE AS ROWS.
+                for (let i = 0; i < data.length; i++) {
+
+                    tr = table.insertRow(-1);
+
+                    for (let j = 0; j < col.length; j++) {
+                        let tabCell = tr.insertCell(-1);
+                        tabCell.innerHTML = data[i][col[j]];
+                    }
+                }
+
+                // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+                let divContainer = document.getElementById(elementID);
+                divContainer.innerHTML = "";
+                divContainer.appendChild(table);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+    }
+</script>
+
+</html>
+
+

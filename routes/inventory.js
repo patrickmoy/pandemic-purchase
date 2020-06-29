@@ -47,28 +47,4 @@ router.get('/', (req, res) => {
         });
 });
 
-router.put('/', (req, res) => {
-    if (req.query.name) {
-        let theQuery = "UPDATE Items SET ItemName = $1";
-        const values = [req.query.name];
-        pool.query(theQuery, values)
-            .then(result => {
-                res.send({
-                    success: true,
-                    message: "Updated!"
-                });
-            })
-            .catch(err => {
-                res.status(400).send({
-                    message: err.detail
-                });
-            });
-    } else {
-        res.status(400).send({
-            message: "Missing info!"
-        });
-    }
-});
-
-
 module.exports = router;
