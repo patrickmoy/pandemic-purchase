@@ -34,15 +34,21 @@ router.use(bodyParser.json());
  */
 router.get('/', (req, res) => {
     let theQuery = "SELECT * FROM Items";
-    pool.query(theQuery)
-        .then(result => {
-            res.status(200).send(result);
-        })
-        .catch(err => {
-            res.status(400).send({
-                message: err.detail
-            });
-        });
+    pool.query(theQuery, (error, result) => {
+        if (error) {
+            throw error;
+        }
+        res.status(200).send(result);
+    })
+    // pool.query(theQuery)
+    //     .then(result => {
+    //         res.status(200).send(result);
+    //     })
+    //     .catch(err => {
+    //         res.status(400).send({
+    //             message: err.detail
+    //         });
+    //     });
 });
 
 module.exports = router;
