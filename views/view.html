@@ -16,7 +16,7 @@ Released   : 20130811
     <title></title>
     <meta name="keywords" content="" />
     <meta name="description" content="" />
-    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
     <link href="/stylesheets/default.css" rel="stylesheet" type="text/css" media="all" />
     <link href="/stylesheets/fonts.css" rel="stylesheet" type="text/css" media="all" />
 
@@ -55,18 +55,7 @@ Released   : 20130811
                 stock. Users can sign up to be notified once an item becomes available. </p>
         </div>
     </div>
-    <div id="contact" class="container">
-        <div class="title">
-            <h2>Get in touch</h2>
-            <span class="byline">Reach out if you'd like to chat!</span>
-        </div>
-        <ul class="contact">
-            <li><a href="#" class="icon icon-github"><span>GitHub</span></a></li>
-            <li><a href="#" class="icon icon-envelope"><span>Email</span></a></li>
-            <li><a href="#" class="icon icon-linkedin"><span>LinkedIn</span></a></li>
-            <li><a href="#" class="icon icon-home"><span>Portfolio</span></a></li>
-        </ul>
-    </div>
+
 </div>
 
 <div id="stock-tab" style="display:none;" class="tab-content">
@@ -90,8 +79,10 @@ Released   : 20130811
     <div class="container">
         <div>
             <div class="title">
-                <h2>Check stock</h2>
+                <h2>Notify Me</h2>
                 <span class="byline">View the full inventory list here</span>
+                <br>
+                <input type="button" onclick="getStockData()" value="View/Refresh"/>
             </div>
 
             <p></p>
@@ -113,6 +104,19 @@ Released   : 20130811
                 obsessively refresh vendor pages to check for the items they want. </p>
         </div>
     </div>
+</div>
+
+<div id="contact" class="container">
+    <div class="title">
+        <h2>Get in touch</h2>
+        <span class="byline">Reach out if you'd like to chat!</span>
+    </div>
+    <ul class="contact">
+        <li><a href="#" class="icon icon-github"><span>GitHub</span></a></li>
+        <li><a href="#" class="icon icon-envelope"><span>Email</span></a></li>
+        <li><a href="#" class="icon icon-linkedin"><span>LinkedIn</span></a></li>
+        <li><a href="#" class="icon icon-home"><span>Portfolio</span></a></li>
+    </ul>
 </div>
 
 <div id="copyright" class="container">
@@ -146,6 +150,7 @@ Released   : 20130811
         fetch(url)
             .then(response => response.json())
             .then(data => {
+                console.log("DATA!:" + data)
                 let col = [];
                 for (let i = 0; i < data.length; i++) {
                     for (let key in data[i]) {
