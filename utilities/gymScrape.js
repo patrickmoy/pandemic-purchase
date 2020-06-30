@@ -5,6 +5,9 @@ const cheerio = require('cheerio');
 
 const pool = require('./sql.js');
 
+// Nodemailer module for email notifications.
+const nodemailer = require("nodemailer");
+
 async function topLevelHandler() {
     try {
         let theQuery = "SELECT LookupID, Link, Vendor, Type FROM Lookups";
@@ -147,9 +150,6 @@ function reformatStock (oldStock) {
         return -1;
     }
 }
-
-// Nodemailer module for email notifications.
-const nodemailer = require("nodemailer");
 
 // Transporter object for nodemailer, using gmail client
 const transporter = nodemailer.createTransport({
