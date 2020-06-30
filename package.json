@@ -16,7 +16,8 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "body-parser": "latest",
-    "pg": "latest"
+    "pg": "latest",
+    "nodemailer": "^6.4.10"
   },
   "devDependencies": {
     "nodemailer": "^6.4.10"
