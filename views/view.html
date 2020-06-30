@@ -29,7 +29,10 @@ Released   : 20130811
 <div id="header">
     <div id="menu" class="container">
         <ul>
-            <li class="current_page_item"><a href="#" class="tab-link" onclick="openPage('home-tab', this);return false;" accesskey="1" title="">Home</a></li>
+            <li class="current_page_item">
+                <a href="#" class="tab-link" onclick="openPage('home-tab', this);return false;" accesskey="1" title=""
+                style="background-color: red">
+                    Home</a></li>
             <li><a href="#" class="tab-link" onclick="openPage('stock-tab', this);return false;" accesskey="2" title="">What's In Stock</a></li>
             <li><a href="#" class="tab-link" onclick="openPage('notify-tab', this);return false;" accesskey="3" title="">Get Notified</a></li>
             <li><a href="#" class="tab-link" onclick="openPage('about-tab', this);return false;" accesskey="4" title="">About</a></li>
@@ -65,6 +68,7 @@ Released   : 20130811
                 <h2>Check stock</h2>
                 <span class="byline">View the full inventory list here</span>
                 <br>
+                <p style="font-size: 10px;">*Occasional false positive may occur on high-demand Rogue items due to caching/fluctuations.</p>
                 <input type="button" onclick="getStockData()" value="View/Refresh"/>
             </div>
 
@@ -80,9 +84,18 @@ Released   : 20130811
         <div>
             <div class="title">
                 <h2>Notify Me</h2>
-                <span class="byline">View the full inventory list here</span>
+                <span class="byline">Enter your email and the ID number of the item you wish to track.</span>
                 <br>
-                <input type="button" onclick="getStockData()" value="View/Refresh"/>
+                <form name="notify-form">
+                    <label>Email:
+                        <input type="text" name="form-email"/>
+                    </label>
+                    <label>ID:
+                        <input type="text" name="form-id"/>
+                    </label>
+                    <input type="button" onclick="notifyFormHandler()" value="Submit"/>
+                </form>
+
             </div>
 
             <p></p>
@@ -109,13 +122,13 @@ Released   : 20130811
 <div id="contact" class="container">
     <div class="title">
         <h2>Get in touch</h2>
-        <span class="byline">Reach out if you'd like to chat!</span>
+        <span class="byline">Reach out with suggestions, or if you'd just like to chat!</span>
     </div>
     <ul class="contact">
-        <li><a href="#" class="icon icon-github"><span>GitHub</span></a></li>
-        <li><a href="#" class="icon icon-envelope"><span>Email</span></a></li>
-        <li><a href="#" class="icon icon-linkedin"><span>LinkedIn</span></a></li>
-        <li><a href="#" class="icon icon-home"><span>Portfolio</span></a></li>
+        <li><a href="https://github.com/patrickmoy/" target="_blank" class="icon icon-github"><span>GitHub</span></a></li>
+        <li><a href="mailto:patrickrnmoy@gmail.com" target="_blank" class="icon icon-envelope"><span>Email</span></a></li>
+        <li><a href="https://www.linkedin.com/in/patrickmoy/" target="_blank" class="icon icon-linkedin"><span>LinkedIn</span></a></li>
+        <li><a href="https://patrickmoy.com/" target="_blank" class="icon icon-home"><span>Portfolio</span></a></li>
     </ul>
 </div>
 
@@ -133,13 +146,14 @@ Released   : 20130811
 
         tabLinks = document.getElementsByClassName("tab-link");
         for (i = 0; i < tabLinks.length; i++) {
-        //    tabLinks[i].style.backgroundColor = "";
+            tabLinks[i].style.backgroundColor = "";
         }
 
         // Show the specific tab content
         document.getElementById(pageName).style.display = "block";
 
         // Add the specific color to the button used to open the tab content
+        element.style.backgroundColor = "red";
     }
 
     function getStockData(parameter = "") {
@@ -150,7 +164,6 @@ Released   : 20130811
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log("DATA!:" + data)
                 let col = [];
                 for (let i = 0; i < data.length; i++) {
                     for (let key in data[i]) {
@@ -167,9 +180,12 @@ Released   : 20130811
 
                 let tr = table.insertRow(-1);                   // TABLE ROW.
 
-                for (let i = 0; i < col.length; i++) {
+                for (let i = 1; i < col.length; i++) {
                     let th = document.createElement("th");      // TABLE HEADER.
-                    th.innerHTML = col[i];
+                    th.innerHTML = col[i].toUpperCase();
+                    if (th.innerHTML === 'INSTOCK') {
+                        th.innerHTML = "IN STOCK";
+                }
                     tr.appendChild(th);
                 }
 
@@ -178,12 +194,34 @@ Released   : 20130811
 
                     tr = table.insertRow(-1);
 
-                    for (let j = 0; j < col.length; j++) {
+                    // Cells from left to right: id, vendor, name, price, stock.
+                    // First column (index 0) is the link
+                    for (let j = 1; j < col.length; j++) {
                         let tabCell = tr.insertCell(-1);
-                        tabCell.innerHTML = data[i][col[j]];
+                        if (j === 3) {
+                            tabCell.innerHTML = "<a href='" + data[i][col[0]] + "' target=\"_blank\">" + data[i][col[j]] + "</a>";
+                        } else {
+                            tabCell.innerHTML = data[i][col[j]];
+                        }
+                        if (j === col.length - 1) {
+                            switch (tabCell.innerHTML) {
+                                case "0":
+                                    tabCell.innerHTML = "Out of stock";
+                                    break;
+                                case "1":
+                                    tabCell.innerHTML = "In stock";
+                                    break;
+                                case "2":
+                                    tabCell.innerHTML = "Backorder - in stock";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
-
+                table.style.width = "100%";
+                table.style.textAlign = "left";
                 // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
                 let divContainer = document.getElementById(elementID);
                 divContainer.innerHTML = "";
@@ -192,7 +230,34 @@ Released   : 20130811
             .catch((err) => {
                 console.log(err);
             });
+    }
 
+    function notifyFormHandler() {
+        let theEmail = document.forms["notify-form"]["form-email"].value;
+        let theId = document.forms["notify-form"]["form-id"].value;
+        if (!theEmail.includes("@")) {
+            alert("Email must be valid");
+            return false;
+        } else if (!/^\d+$/.test(theId)) {
+            alert("ID of item must be valid");
+            return false;
+        } else {
+            let url = "https://pandemic-purchase.herokuapp.com/data" + "?email=" + theEmail + "&id=" + parseInt(theId);
+            fetch(url, {
+                credentials: 'same-origin',
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json;'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
     }
 </script>
 

@@ -7,6 +7,18 @@ const app = express();
 // Bodyparser npm module
 const bodyParser = require("body-parser");
 
+/**
+ * BodyParser URL encoded parsing function.
+ */
+app.use(bodyParser.urlencoded({
+    extended: true,
+}));
+
+/**
+ * BodyParser JSON parsing function.
+ */
+app.use(bodyParser.json());
+
 // Path module for managing directory access
 const path = require('path');
 
