@@ -23,20 +23,22 @@ async function topLevelHandler() {
             .catch(err => {
                 console.log("Link retrieval failed - " + err.detail);
             });
-        let notificationQuery = "SELECT Lookups.Link As Hyperlink, Items.Name, Notifications.Email," +
+        let notificationQuery = "SELECT Lookups.Link As Hyperlink, Items.Name, Items.InStock, Notifications.Email," +
             " Notifications.NotificationID FROM Notifications INNER JOIN Items ON Notifications.ItemID = " +
             "Items.ItemID INNER JOIN Lookups ON Lookups.LookupID = Items.LookupID";
         pool.query(notificationQuery)
             .then(result => {
                 for (let i = 0; i < result.rows.length; i++) {
-                    sendNotificationEmail(result.rows[i].email, result.rows[i].name, result.rows[i].hyperlink);
-                    let deleteQuery = "DELETE FROM NOTIFICATIONS WHERE NotificationID = $1";
-                    let deleteValue = [result.rows[i].notificationid];
-                    pool.query(deleteQuery, deleteValue)
-                        .then(result => {
-                            console.log("Notification removed!");
-                        })
-                        .catch(err => console.log(err));
+                    if (result.rows[i].instock === 1) {
+                        sendNotificationEmail(result.rows[i].email, result.rows[i].name, result.rows[i].hyperlink);
+                        let deleteQuery = "DELETE FROM NOTIFICATIONS WHERE NotificationID = $1";
+                        let deleteValue = [result.rows[i].notificationid];
+                        pool.query(deleteQuery, deleteValue)
+                            .then(result => {
+                                console.log("Notification removed!");
+                            })
+                            .catch(err => console.log(err));
+                    }
                 }
             }).catch(err => console.log(err));
     } catch (err) {
