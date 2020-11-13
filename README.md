@@ -14,8 +14,7 @@ Planned features for implementation: revamped UI for viewing, sorting and filter
 
 You'll need a PostgreSQL server instance, Node.js, and npm.
 
-Create a process.env file and add the line "DATABASE_URL = [insert database url here]"
-npm install
-npm start
-
-Access locally at localhost:5000
+1. Create a process.env file and add the line "DATABASE_URL = [insert database url here]"
+2. npm install
+3. npm start
+4. Access locally at localhost:5000
